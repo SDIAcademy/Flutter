@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import './Login.dart';
-import './calculator.dart';
+import './TabBar.dart';
 import './ChatApp.dart';
 import './drawerflutter.dart';
 
@@ -19,7 +19,7 @@ class Login extends StatelessWidget {
       ),
        routes: <String, WidgetBuilder>{
         "/go": (BuildContext context) => HomePage(),
-        "/1": (BuildContext context) => CalculatorPage(),
+        "/1": (BuildContext context) => TabComponent(),
         "/2": (BuildContext context) => ChatPage(),
       }
     );

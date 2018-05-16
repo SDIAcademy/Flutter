@@ -1,22 +1,6 @@
 import 'package:flutter/material.dart';
 import 'Step.dart';
-// import 'calculator.dart';
 
-class DrawerFlutter extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-      ),
-      home: HomePage(),
-      routes: <String, WidgetBuilder>{
-        // "/1": (BuildContext context) => CalculatorPage(),
-        // "/2": (BuildContext context) => ChatPage(),
-      }
-    );
-  }
-}
 
 class HomePage extends StatelessWidget {
   @override
@@ -54,7 +38,6 @@ class HomePage extends StatelessWidget {
             ),
             new Divider(height: 1.0),
             new ListTile(
-              title: Text("Close"),
               trailing: Icon(Icons.close),
               onTap: ()=>Navigator.of(context).pop(),
             ),

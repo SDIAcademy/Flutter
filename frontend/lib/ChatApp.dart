@@ -1,15 +1,5 @@
 import 'package:flutter/material.dart';
 
-class ChatApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: "ChatApp",
-      home: ChatPage(),
-    );
-  }
-}
-
 class ChatPage extends StatefulWidget {
   @override
   _ChatPageState createState() => new _ChatPageState();

@@ -1,52 +1,46 @@
 import 'package:flutter/material.dart';
 
-//void main() => runApp(Calculator());
-
-class Calculator extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "calculator",
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-      ),
-      home: CalculatorPage(),
-    );
-  }
-}
 class CalculatorPage extends StatefulWidget {
+  final String state;
+  CalculatorPage(this.state);
   @override
-  _CalculatorPageState createState() => new _CalculatorPageState();
+  _CalculatorPageState createState() => new _CalculatorPageState(state);
 }
 
 class _CalculatorPageState extends State<CalculatorPage> {
+  String state;
+  _CalculatorPageState(this.state);
+  
   int num1=0, num2=0, sum=0;
-  final TextEditingController t1 = TextEditingController(text: "0");
-  final TextEditingController t2 = TextEditingController(text: "0");
-  void calIni(fn){
+  final TextEditingController t1 = TextEditingController(text: "");
+  final TextEditingController t2 = TextEditingController(text: "");
+  void calIni(state){
+    var fn;
+    int add(n1, n2){
+      return n1 + n2;
+    }
+    int sub(n1, n2){
+      return n1 - n2;
+    }
+    int mul(n1, n2){
+      return n1 * n2;
+    }
+    if (state == '+')
+      fn = add;
+    else if (state == '-')
+      fn = sub;
+    else fn = mul;
     setState(() {
       num1 = int.parse(t1.text);
       num2 = int.parse(t2.text);
       sum = fn(num1,num2);
     });
   }
-  int add(n1, n2){
-      return n1 + n2;
-  }
-  int sub(n1, n2){
-    return n1 - n2;
-  }
-  int mul(n1, n2){
-    return n1 * n2;
-  }
+  
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        appBar: AppBar(
-          title: Text("Calculator"),
-        ),
-        body: Container(
+    return Container(
           padding: EdgeInsets.all(40.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -66,31 +60,14 @@ class _CalculatorPageState extends State<CalculatorPage> {
                 controller: t2,
               ),
               Padding(
-                padding: EdgeInsets.only(top: 30.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    RaisedButton(
-                      child: Text("+"),
-                      onPressed: ()=> calIni(add),
-                    ),
-                    RaisedButton(
-                      child: Text("-"),
-                      onPressed: ()=>calIni(sub),
-                    ),
-//                    RaisedButton(
-//                      child: Text("*"),
-//                      onPressed: (){},
-//                    ),
-                    RaisedButton(
-                      child: Text("/"),
-                      onPressed: ()=>calIni(mul),
-                    ),
-                  ],
+                padding: EdgeInsets.symmetric(vertical: 30.0),
+                child: RaisedButton(
+                  child: Text(state),
+                  onPressed: ()=> calIni(state),
                 ),
               ),
               Text(
-                "Output $sum",
+                "= $sum",
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
@@ -99,7 +76,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
               )
             ],
           ),
-        )
-    );
+        );
   }
 }
