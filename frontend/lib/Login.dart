@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'drawerflutter.dart';
+import 'snack.dart';
 
 class Login extends StatelessWidget {
   @override
@@ -107,6 +107,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           splashColor: Colors.greenAccent,
                           onPressed: ()=>Navigator.of(context).pushNamed("/go"),
                         ),
+                        Snake(),
                       ],
                     ),
                   ),
