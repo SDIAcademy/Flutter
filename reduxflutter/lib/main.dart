@@ -3,83 +3,105 @@ import 'package:meta/meta.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-void main() => runApp(new MyHomePage());
+class ListState{
+  final List<String> items;
+  ListState({this.items});
+  
+  ListState.initialState() : items = [];
 
-@immutable
-class AppState {
-  final counter;
-  AppState(this.counter);
 }
 
-//action
-enum Actions { Increment }
+class AddAction {
+  final String input;
+  AddAction({this.input});
+}
 
-//pure function
-AppState reducer(AppState prev, action) {
-  if (action == Actions.Increment) {
-    return new AppState(prev.counter + 1);
+ListState reducer(ListState state, action){
+  if (action is AddAction){
+    return ListState(
+      items: []
+      ..addAll(state.items)
+      ..add(action.input)
+    );
   }
-  return prev;
+  return ListState(items: state.items);
 }
 
+void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  final store = Store<ListState>(reducer, initialState: ListState.initialState());
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Flutter Demo',
-      theme: new ThemeData.dark(),
-      debugShowCheckedModeBanner: false,
-      home: new MyHomePage(),
+    return StoreProvider<ListState>(
+      store: store,
+      child: MaterialApp(
+        theme: ThemeData.dark(),
+        title: "My Redux App",
+        home: Home(),
+      ),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  final store = new Store(reducer, initialState: new AppState(0));
 
+class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new StoreProvider(
-        store: store,
-        child: new 
-        MaterialApp(
-      title: 'Flutter Demo',
-      theme: new ThemeData.dark(),
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-          appBar: new AppBar(
-            title: new Text("Redux App"),
-          ),
-          body: new Center(
-            child: new Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                new Text(
-                  'You have pushed the button this many times:',
-                ),
-                new StoreConnector(
-                  converter: (store) => store.state.counter,
-                  builder: (context, counter) => new Text(
-                        '$counter',
-                        style: Theme.of(context).textTheme.display1,
-                      ),
-                )
-              ],
-            ),
-          ),
-          floatingActionButton: new StoreConnector(
-            converter: (store) {
-              return () => store.dispatch(Actions.Increment);
-            },
-            builder: (context, callback) => new FloatingActionButton(
-                  onPressed: callback,
-                  tooltip: 'Increment',
-                  child: new Icon(Icons.add),
-                ), // This trailing comma makes auto-formatting nicer for build methods.
-          ),
+    return Scaffold(
+      appBar: AppBar(title: Text("Redux")),
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            ListInput(),
+            ViewList(),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+typedef AddItem(String text);
+class _ViewModel {
+  final AddItem addItemToList;
+  _ViewModel({this.addItemToList});
+}
+
+
+class ListInput extends StatefulWidget {
+  @override
+  _ListInputState createState() => new _ListInputState();
+}
+
+class _ListInputState extends State<ListInput> {
+  final TextEditingController controller = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return StoreConnector<ListState, _ViewModel>(
+      converter: (store) => _ViewModel(
+        addItemToList: (inputText) => store.dispatch(AddAction(
+          input: inputText
+        ))
+      ),
+      builder: (context,viewModel)=> TextField(
+          controller: controller,
+          onSubmitted: (text){
+            viewModel.addItemToList(text);
+            controller.text = "";
+          },
         ),
+    );
+  }
+}
+
+class ViewList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StoreConnector<ListState, List<String>>(
+      converter:(store)=>store.state.items,
+      builder: (context, items) => Column(
+        children: items.map((i)=>ListTile(title:Text(i))).toList(),
+      ),
     );
   }
 }
