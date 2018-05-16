@@ -1,0 +1,30 @@
+[
+    {
+        "name" : "Zayn",
+        "age" : "19",
+        "height" : "181",
+        "gender" : "male",
+        "hair_color" : "black"
+    },
+    {
+        "name": "Jane",
+        "age": "29",
+        "height": "161",
+        "gender": "female",
+        "hair_color": "yellow"
+    },
+    {
+        "name": "Jones",
+        "age": "33",
+        "height": "178",
+        "gender": "male",
+        "hair_color": "grey"
+    },
+    {
+        "name": "Jarvis",
+        "age": "9",
+        "height": "160",
+        "gender": "male",
+        "hair_color": "black"
+    }
+]
