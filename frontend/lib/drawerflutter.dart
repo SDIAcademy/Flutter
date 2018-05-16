@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'ChatApp.dart';
+import 'Step.dart';
 // import 'calculator.dart';
 
 class DrawerFlutter extends StatelessWidget {
@@ -24,7 +24,6 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title:Text("Drawer")),
       drawer: Drawer(
-
         child: ListView(
           children: <Widget>[
             UserAccountsDrawerHeader(
@@ -64,7 +63,7 @@ class HomePage extends StatelessWidget {
       ),
       body: Container(
         child: Center(
-          child:Text("Home Page"),
+          child:StepComponent(),
         ),
       )
     );
