@@ -1,0 +1,4 @@
+#Sat May 19 07:11:48 SGT 2018
+base.0=D\:\\Code\\flutter\\sliver\\build\\app\\intermediates\\transforms\\dexMerger\\debug\\0
+path.0=classes.dex
+renamed.0=classes.dex
