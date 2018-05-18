@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config=":video_player"><source path="D:\Code\flutter\video\build\video_player\intermediates\bundles\debug\assets"/></dataSet><dataSet config="main"><source path="D:\Code\flutter\video\android\app\src\main\assets"/><source path="D:\Code\flutter\video\build\app\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="D:\Code\flutter\video\android\app\src\debug\assets"/></dataSet></merger>
