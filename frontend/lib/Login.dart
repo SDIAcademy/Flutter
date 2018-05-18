@@ -14,6 +14,7 @@ class Login extends StatelessWidget {
         // "/1": (BuildContext context) => CalculatorPage(),
         // "/2": (BuildContext context) => ChatPage(),
       }
+       
     );
   }
 }
@@ -49,22 +50,21 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.black38,
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
           Image(
-            image: AssetImage("assets/summer.png"),
-            fit: BoxFit.cover,
+            image: AssetImage("assets/sdi_bg.png"),
+            fit: BoxFit.contain,
             color: Colors.black87,
             colorBlendMode: BlendMode.darken,
           ),
           new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              FlutterLogo(
-                size: _iconAnimation.value * 100,
-              ),
+              Image(image: AssetImage("assets/sdi.png"),width: _iconAnimation.value * 100),
               Form(
                 child: Theme(
                   data: ThemeData(
