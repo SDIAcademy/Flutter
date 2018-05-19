@@ -35,20 +35,20 @@ class _MainPageState extends State<MainPage> {
                 // print(source[1]);
                 // source.id;
                 
-                var x = ocb();
+                var _user = ocb();
                 // x['name'];
-                print(x.displayName);
+                print(_user.displayName);
                 // print(x['user']);
                 return UserAccountsDrawerHeader(
                   accountName:
-                  Text("source.name"),
-                  // Text(source[1]),
+                  // Text("source.name"),
+                  Text(_user.displayName),
                   accountEmail: 
-                  Text("user.email"),
-                  // Text(source[2]),
+                  // Text("user.email"),
+                  Text(_user.email),
                   currentAccountPicture: 
-                  // GoogleUserCircleAvatar(identity: source[0]),
-                  CircleAvatar(backgroundColor: Colors.amber,child: Text("Z")),
+                  GoogleUserCircleAvatar(identity: _user),
+                  // CircleAvatar(backgroundColor: Colors.amber,child: Text("Z")),
                   otherAccountsPictures: <Widget>[
                     CircleAvatar(backgroundColor: Colors.amber,child: Text("Z")),
                 ],

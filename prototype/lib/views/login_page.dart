@@ -39,20 +39,13 @@ class LoginPageState extends State<LoginPage> {
   Future<Null> _handleSignIn(viewModel) async {
     try {
       await _googleSignIn.signIn();
-      print(1);
-      print(_currentUser.id);
-      print(_currentUser.displayName);
-      print(_currentUser.email);
       // print(_currentUser);
 
       viewModel.addUser(
-        _currentUser,
-        _currentUser.displayName,
-        _currentUser.id,
-        _currentUser.email
+        _currentUser
       );
       // viewModel.addUser(_currentUser);
-      print(2);
+      print('success');
     } catch (error) {
       print('error');
       print(error);
@@ -113,15 +106,9 @@ class LoginPageState extends State<LoginPage> {
           StoreConnector<AppState, ViewModel>(
             converter: (store) => ViewModel(
               addUser:(
-                userInfo,
-                name,
-                id,
-                email
+                userInfo
               ) => store.dispatch(AddUser(
-                user: userInfo,
-                name: _currentUser.displayName,
-                id: _currentUser.id,
-                email: _currentUser.email
+                user: userInfo
               ))
             ),
             builder: (context,viewModel)=> MaterialButton(
