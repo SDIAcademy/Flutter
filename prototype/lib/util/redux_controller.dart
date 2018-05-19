@@ -51,3 +51,9 @@ class ViewModel {
   final AddView addUser;
   ViewModel({this.addUser});
 }
+
+typedef ObjectCallBack = dynamic Function();
+class ViewCallBack {
+  final ObjectCallBack ocb;
+  ViewCallBack({this.ocb});
+}

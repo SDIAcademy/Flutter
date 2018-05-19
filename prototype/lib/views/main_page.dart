@@ -18,37 +18,37 @@ class _MainPageState extends State<MainPage> {
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
-            StoreConnector<AppState, List>(
+            StoreConnector<AppState, ObjectCallBack>(
               converter: (store) {
                 print("here");
-                print(store.state.user);
-                // return <String, dynamic>{ 
-                //   "user": store.state.user,
-                //   "name": store.state.name,
-                //   "email": store.state.email,
-                //   "id": store.state.id
+                // print(store.state.user);
+                // return () => <String, dynamic>{ 
+                //   'user': store.state.user,
+                //   'name': store.state.name,
+                //   'email': store.state.email,
+                //   'id': store.state.id
                 //   };
-                return [
-                  store.state.user,
-                  store.state.name,
-                  store.state.email,
-                  store.state.id
-                ];
+                return () => store.state.user;
               },
-              builder: (context, source) {
+              builder: (context, ocb) {
                 // Object user = jsonEncode(source);
-                print(source[1]);
+                // print(source[1]);
                 // source.id;
+                
+                var x = ocb();
+                // x['name'];
+                print(x.displayName);
+                // print(x['user']);
                 return UserAccountsDrawerHeader(
                   accountName:
-                  // Text(source.name),
-                  Text(source[1]),
+                  Text("source.name"),
+                  // Text(source[1]),
                   accountEmail: 
-                  // Text(user.email),
-                  Text(source[2]),
+                  Text("user.email"),
+                  // Text(source[2]),
                   currentAccountPicture: 
-                  GoogleUserCircleAvatar(identity: source[0]),
-                  // CircleAvatar(backgroundColor: Colors.amber,child: Text("Z")),
+                  // GoogleUserCircleAvatar(identity: source[0]),
+                  CircleAvatar(backgroundColor: Colors.amber,child: Text("Z")),
                   otherAccountsPictures: <Widget>[
                     CircleAvatar(backgroundColor: Colors.amber,child: Text("Z")),
                 ],
