@@ -3,117 +3,156 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:io';
+import 'dart:convert' show json;
 
+import "package:http/http.dart" as http;
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-final FirebaseAuth _auth = FirebaseAuth.instance;
-final GoogleSignIn _googleSignIn = new GoogleSignIn();
+GoogleSignIn _googleSignIn = new GoogleSignIn(
+  scopes: <String>[
+    'email',
+    'https://www.googleapis.com/auth/contacts.readonly',
+  ],
+);
 
 void main() {
-  runApp(new MyApp());
+  runApp(
+    new MaterialApp(
+      title: 'Google Sign In',
+      home: new LoginPage(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Firebase Auth Demo',
-      home: new MyHomePage(title: 'Firebase Auth Demo'),
-    );
+  State createState() => new LoginPageState();
+}
+
+class LoginPageState extends State<LoginPage> {
+  GoogleSignInAccount _currentUser;
+  String _contactText;
+
+  @override
+  void initState() {
+    super.initState();
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
+      setState(() {
+        _currentUser = account;
+      });
+      if (_currentUser != null) {
+        _handleGetContact();
+      }
+    });
+    _googleSignIn.signInSilently();
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => new _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  Future<String> _message = new Future<String>.value('');
-
-  Future<String> _testSignInAnonymously() async {
-    final FirebaseUser user = await _auth.signInAnonymously();
-    assert(user != null);
-    assert(user.isAnonymous);
-    assert(!user.isEmailVerified);
-    assert(await user.getIdToken() != null);
-    if (Platform.isIOS) {
-      // Anonymous auth doesn't show up as a provider on iOS
-      assert(user.providerData.isEmpty);
-    } else if (Platform.isAndroid) {
-      // Anonymous auth does show up as a provider on Android
-      assert(user.providerData.length == 1);
-      assert(user.providerData[0].providerId == 'firebase');
-      assert(user.providerData[0].uid != null);
-      assert(user.providerData[0].displayName == null);
-      assert(user.providerData[0].photoUrl == null);
-      assert(user.providerData[0].email == null);
+  Future<Null> _handleGetContact() async {
+    setState(() {
+      _contactText = "Loading contact info...";
+    });
+    final http.Response response = await http.get(
+      'https://people.googleapis.com/v1/people/me/connections'
+          '?requestMask.includeField=person.names',
+      headers: await _currentUser.authHeaders,
+    );
+    if (response.statusCode != 200) {
+      setState(() {
+        _contactText = "People API gave a ${response.statusCode} "
+            "response. Check logs for details.";
+      });
+      print('People API ${response.statusCode} response: ${response.body}');
+      return;
     }
-
-    final FirebaseUser currentUser = await _auth.currentUser();
-    assert(user.uid == currentUser.uid);
-
-    return 'signInAnonymously succeeded: $user';
+    final Map<String, dynamic> data = json.decode(response.body);
+    final String namedContact = _pickFirstNamedContact(data);
+    setState(() {
+      if (namedContact != null) {
+        _contactText = "I see you know $namedContact!";
+      } else {
+        _contactText = "No contacts to display.";
+      }
+    });
   }
 
-  Future<String> _testSignInWithGoogle() async {
-    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-    final FirebaseUser user = await _auth.signInWithGoogle(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
+  String _pickFirstNamedContact(Map<String, dynamic> data) {
+    final List<dynamic> connections = data['connections'];
+    final Map<String, dynamic> contact = connections?.firstWhere(
+      (dynamic contact) => contact['names'] != null,
+      orElse: () => null,
     );
-    assert(user.email != null);
-    assert(user.displayName != null);
-    assert(!user.isAnonymous);
-    assert(await user.getIdToken() != null);
+    if (contact != null) {
+      final Map<String, dynamic> name = contact['names'].firstWhere(
+        (dynamic name) => name['displayName'] != null,
+        orElse: () => null,
+      );
+      if (name != null) {
+        return name['displayName'];
+      }
+    }
+    return null;
+  }
 
-    final FirebaseUser currentUser = await _auth.currentUser();
-    assert(user.uid == currentUser.uid);
+  Future<Null> _handleSignIn() async {
+    try {
+      await _googleSignIn.signIn();
+    } catch (error) {
+      print(error);
+    }
+  }
 
-    return 'signInWithGoogle succeeded: $user';
+  Future<Null> _handleSignOut() async {
+    _googleSignIn.disconnect();
+  }
+
+  Widget _buildBody() {
+    if (_currentUser != null) {
+      return new Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          new ListTile(
+            leading: new GoogleUserCircleAvatar(
+              identity: _currentUser,
+            ),
+            title: new Text(_currentUser.displayName),
+            subtitle: new Text(_currentUser.email),
+          ),
+          const Text("Signed in successfully."),
+          new Text(_contactText),
+          new RaisedButton(
+            child: const Text('SIGN OUT'),
+            onPressed: _handleSignOut,
+          ),
+          new RaisedButton(
+            child: const Text('REFRESH'),
+            onPressed: _handleGetContact,
+          ),
+        ],
+      );
+    } else {
+      return new Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          const Text("You are not currently signed in."),
+          new RaisedButton(
+            child: const Text('SIGN IN'),
+            onPressed: _handleSignIn,
+          ),
+        ],
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
-      ),
-      body: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          new MaterialButton(
-              child: const Text('Test signInAnonymously'),
-              onPressed: () {
-                setState(() {
-                  _message = _testSignInAnonymously();
-                });
-              }),
-          new MaterialButton(
-              child: const Text('Test signInWithGoogle'),
-              onPressed: () {
-                setState(() {
-                  _message = _testSignInWithGoogle();
-                });
-              }),
-          new FutureBuilder<String>(
-              future: _message,
-              builder: (_, AsyncSnapshot<String> snapshot) {
-                return new Text(snapshot.data ?? '',
-                    style: const TextStyle(
-                        color: const Color.fromARGB(255, 0, 155, 0)));
-              }),
-        ],
-      ),
-    );
+        appBar: new AppBar(
+          title: const Text('Google Sign In'),
+        ),
+        body: new ConstrainedBox(
+          constraints: const BoxConstraints.expand(),
+          child: _buildBody(),
+        ));
   }
 }
