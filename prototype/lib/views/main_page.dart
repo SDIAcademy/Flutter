@@ -23,9 +23,27 @@ class MainPage extends StatefulWidget {
 
 class MainPageState extends State<MainPage> {
   GoogleSignInAccount _currentUser;
+  String _currentDrawer;
+  List _drawerStore = [
+    {
+      'title': "Home",
+      "callback": (){},
+    },
+    {
+      'title': "Interests",
+      "callback": (){},
+    },
+    {
+      'title': "Events",
+      "callback": (){},
+    }
+  ];
   @override
   void initState() {
     super.initState();
+    
+    _currentDrawer = "Home";
+
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
       setState(() {
         _currentUser = account;
@@ -46,8 +64,32 @@ class MainPageState extends State<MainPage> {
     _googleSignIn.disconnect();
   }
 
+  
   Widget _buildBody() {
     if (_currentUser != null) {
+      List<Widget> _drawerItems = [];
+      _drawerStore.forEach((item){
+        _drawerItems.add(
+          new Padding(
+            padding: const EdgeInsets.only(left: 15.0),
+            child: ListTileTheme(
+              selectedColor: Colors.black,
+              textColor: Colors.grey,
+              child: ListTile(
+                selected: _currentDrawer == item['title'] ,
+                title: Text(item['title']),
+                onTap: (){
+                  setState(() {
+                    _currentDrawer = item['title'];                   
+                  });
+                  Navigator.of(context).pop();
+                  // Navigator.of(context).push(item['callback]());
+                }
+              ),
+            ),
+          ),
+        );
+      });
       return Scaffold(
         drawer: Drawer(
           child: ListView(
@@ -58,39 +100,46 @@ class MainPageState extends State<MainPage> {
                 },
                 builder: (context, ocb) {
                   var _user = ocb();
-                  print(_user.id);
-                  return UserAccountsDrawerHeader(
-                    margin: EdgeInsets.all(10.0),
-                    accountName: Text(_user.displayName),
-                    accountEmail: Text(_user.email, style: TextStyle(
-                      color: Colors.grey.withOpacity(0.6)
-                    ),),
-                    currentAccountPicture: GoogleUserCircleAvatar(identity: _user),
-                );
+                  return new Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: UserAccountsDrawerHeader(
+                      onDetailsPressed: (){
+                        print(_user.email);
+                      },
+                      accountName: Text(
+                        _user.displayName,
+                        style:TextStyle(
+                          fontSize: 15.0,
+                          fontWeight: FontWeight.w600,
+                        )),
+                      accountEmail: Text(
+                        "\nsee profile",
+                        style: TextStyle(
+                          fontSize: 13.0,
+                          color: Colors.grey.withOpacity(0.6)
+                        ),
+                      ),
+                      currentAccountPicture: GoogleUserCircleAvatar(identity: _user),
+                ),
+                  );
                 }
               ),
-              new ListTile(
-                title: Text("Page 1"),
-                trailing: Icon(Icons.arrow_right),
-                onTap: (){
-                  Navigator.of(context).pop();
-                }
-              ),
-              new ListTile(
-                title: Text("Page 2"),
-                trailing: Icon(Icons.arrow_right),
-                onTap: (){
-                  Navigator.of(context).pop();
-                }
-              ),
-              new Divider(height: 1.0),
+              Column(children: _drawerItems),
+              Divider(height: 1.0),
               StoreConnector<AppState, ViewModel>(
                 converter: (store)=>ViewModel(
                   addUser: (user) => store.dispatch(user)
                 ),
                 builder: (ctx, viewModel) => ListTile(
-                  title: Text("Sign Out"),
-                  trailing: Icon(Icons.close),
+                  title: new Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(
+                      "Sign Out",
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                      )
+                    ),
+                  ),
                   onTap: ()=>_handleSignOut(viewModel),
                 ),
               ),

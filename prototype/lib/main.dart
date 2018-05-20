@@ -19,6 +19,7 @@ class Tribes extends StatelessWidget {
         home: MainPage(store:store),
         theme: ThemeData(
           primaryColor: Colors.white,
+          fontFamily: 'Brela',
         ),
         routes: <String, WidgetBuilder>{
           "/main": (BuildContext context) => MainPage(store:store),
