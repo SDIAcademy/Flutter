@@ -8,7 +8,6 @@ class MockUserRepo implements Repo{
 
   Future<List> fetchData(){
     List<UserData> data = userData.map((user) => UserData.fromMap(user)).toList();
-    print(data);
     return Future.value(data);
   }
 }
