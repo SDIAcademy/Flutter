@@ -1,146 +1,173 @@
 import 'dart:async';
-
+// import 'dart:convert' show json;
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import '../util/redux_controller.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'dart:convert';
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+
+import '../util/redux_controller.dart';
+
+GoogleSignIn _googleSignIn = new GoogleSignIn(
+  scopes: <String>[
+    'email',
+    'https://www.googleapis.com/auth/contacts.readonly',
+  ],
+);
 
 class MainPage extends StatefulWidget {
+  final store;
+  MainPage({this.store});
   @override
-  _MainPageState createState() => new _MainPageState();
+  State createState() => new MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class MainPageState extends State<MainPage> {
+  GoogleSignInAccount _currentUser;
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            StoreConnector<AppState, ObjectCallBack>(
-              converter: (store) {
-                print("here");
-                // print(store.state.user);
-                // return () => <String, dynamic>{ 
-                //   'user': store.state.user,
-                //   'name': store.state.name,
-                //   'email': store.state.email,
-                //   'id': store.state.id
-                //   };
-                return () => store.state.user;
-              },
-              builder: (context, ocb) {
-                // Object user = jsonEncode(source);
-                // print(source[1]);
-                // source.id;
-                
-                var _user = ocb();
-                // x['name'];
-                print(_user.displayName);
-                // print(x['user']);
-                return UserAccountsDrawerHeader(
-                  accountName:
-                  // Text("source.name"),
-                  Text(_user.displayName),
-                  accountEmail: 
-                  // Text("user.email"),
-                  Text(_user.email),
-                  currentAccountPicture: 
-                  GoogleUserCircleAvatar(identity: _user),
-                  // CircleAvatar(backgroundColor: Colors.amber,child: Text("Z")),
-                  otherAccountsPictures: <Widget>[
-                    CircleAvatar(backgroundColor: Colors.amber,child: Text("Z")),
-                ],
-              );
-              }
-            ),
-            new ListTile(
-              title: Text("Page 1"),
-              trailing: Icon(Icons.arrow_right),
-              onTap: (){
-                Navigator.of(context).pop();
-                Navigator.of(context).pushNamed("/1");
-              }
-            ),
-            new ListTile(
-              title: Text("Page 2"),
-              trailing: Icon(Icons.arrow_right),
-              onTap: (){
-                Navigator.of(context).pop();
-                Navigator.of(context).pushNamed("/2");
-              }
-            ),
-            new Divider(height: 1.0),
-            // StoreConnector<AppState, ViewModel>(
-            //   converter: (store)=>ViewModel(
-            //     addUser: (user) => store.dispatch(user)
-            //   ),
-            //   builder: (ctx, viewModel) => ListTile(
-            //     title: Text("Sign Out"),
-            //     trailing: Icon(Icons.close),
-            //     // onTap: ()=>_handleSignOut(viewModel),
-            //   ),
-            // ),
-          ],
-        ),
-      ),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            title: Container(
-              padding: EdgeInsets.only(left: 10.0,),
-              child: Text(
-                'Home',
-                style: TextStyle(
-                color: Colors.white,
+  void initState() {
+    super.initState();
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
+      print('changed');
+      setState(() {
+        _currentUser = account;
+        widget.store.dispatch(AddUser(user:_currentUser));
+      });
+    });
+    _googleSignIn.signInSilently();
+  }
+
+  Future<Null> _handleSignIn(viewModel) async {
+    await _googleSignIn.signIn();
+    viewModel.addUser(
+      _currentUser
+    );
+  }
+  Future<Null> _handleSignOut(viewModel) async {
+    viewModel.addUser({});
+    _googleSignIn.disconnect();
+  }
+
+  Widget _buildBody() {
+    if (_currentUser != null) {
+      return Scaffold(
+        drawer: Drawer(
+          
+          child: ListView(
+            children: <Widget>[
+              StoreConnector<AppState, ObjectCallBack>(
+                converter: (store) {
+                  return () => store.state.user;
+                },
+                builder: (context, ocb) {
+                  var _user = ocb();
+                  return UserAccountsDrawerHeader(
+                    accountName: Text(_user.displayName),
+                    accountEmail: Text(_user.email),
+                    currentAccountPicture: GoogleUserCircleAvatar(identity: _user),
+                );
+                }
+              ),
+              new ListTile(
+                title: Text("Page 1"),
+                trailing: Icon(Icons.arrow_right),
+                onTap: (){
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushNamed("/1");
+                }
+              ),
+              new ListTile(
+                title: Text("Page 2"),
+                trailing: Icon(Icons.arrow_right),
+                onTap: (){
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushNamed("/2");
+                }
+              ),
+              new Divider(height: 1.0),
+              StoreConnector<AppState, ViewModel>(
+                converter: (store)=>ViewModel(
+                  addUser: (user) => store.dispatch(user)
+                ),
+                builder: (ctx, viewModel) => ListTile(
+                  title: Text("Sign Out"),
+                  trailing: Icon(Icons.close),
+                  onTap: ()=>_handleSignOut(viewModel),
                 ),
               ),
-            ),
-            floating: true,
-            // centerTitle: true,
-            elevation: 10.0,
-            expandedHeight: 50.0,
-            
+            ],
           ),
-          // SliverGrid(
-          //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          //     crossAxisCount: 3,
-          //     mainAxisSpacing: 10.0,
-          //     crossAxisSpacing: 10.0,
-          //     childAspectRatio: 5.0,
-          //   ),
-          //   delegate:
-          //       SliverChildBuilderDelegate((BuildContext context, int index) {
-          //     return Container(
-          //       alignment: Alignment.center,
-          //       color: Colors.purple[100 * (index % 9)],
-          //       child: Text('Grid Item: $index'),
-          //     );
-          //   }, childCount: 102),
-          // ),
-          // SliverFillViewport(
-          //   delegate:
-          //       SliverChildBuilderDelegate((BuildContext context, int index) {
-          //     return Container(
-          //       child: Text('Sliver Fill Viewport'),
-          //       color: Colors.lightBlue,
-          //     );
-          //   }, childCount: 2),
-          // ),
-          SliverFixedExtentList(
-            itemExtent: 100.0,
-            delegate:
-                SliverChildBuilderDelegate((BuildContext context, int index) {
-              return Container(
-                alignment: Alignment.center,
-                color: Colors.indigo[100 * (index % 9)],
-                child: Text('List Item: $index'),
-              );
-            }),
-          )
+        ),
+        body: CustomScrollView(
+          slivers: <Widget>[
+            SliverAppBar(
+              iconTheme: IconThemeData(
+                color: Colors.white,
+              ),
+              backgroundColor: Colors.black,
+              title: Container(
+                padding: EdgeInsets.only(left: 5.0,),
+                child: Text(
+                  'Home',
+                  style: TextStyle(
+                  color: Colors.white,
+                  ),
+                ),
+              ),
+              floating: true,
+              // centerTitle: true,
+              elevation: 5.0,
+              // expandedHeight: 50.0,
+            ),
+            SliverFixedExtentList(
+              itemExtent: 100.0,
+              delegate:
+                  SliverChildBuilderDelegate((BuildContext context, int index) {
+                return Container(
+                  alignment: Alignment.center,
+                  color: Colors.teal[100 * (index % 9)],
+                  child: Text('List Item: $index'),
+                );
+              }),
+            )
+          ],
+        ),
+      );
+    } else {
+      return new Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Image(image: AssetImage("assets/sdi.png"),width: 200.0),
+          StoreConnector<AppState, ViewModel>(
+            converter: (store) => ViewModel(
+              addUser:(
+                userInfo
+              ) => store.dispatch(AddUser(
+                user: userInfo
+              ))
+            ),
+            builder: (context,viewModel)=> MaterialButton(
+                height: 40.0,
+                minWidth: 80.0,
+                color: Colors.teal,
+                textColor: Colors.white,
+                child: Text("Login With Google Account"),
+                onPressed: ()=>_handleSignIn(viewModel),
+              ),
+          ),
         ],
-      ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      resizeToAvoidBottomPadding: false,
+      backgroundColor: Colors.teal,
+      body: new ConstrainedBox(
+        constraints: const BoxConstraints.expand(),
+        child: _buildBody(),
+      )
     );
   }
 }
