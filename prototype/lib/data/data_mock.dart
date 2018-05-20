@@ -14,7 +14,7 @@ class MockUserRepo implements Repo{
 
 List<Map<String, dynamic>> userData = [
   {
-  "uid": "",
+  "uid": "111543282107749631276",
   "name": "Zayn Jarvis",
   "email": "zaynjarvis@gmail.com",
   "interests": [
@@ -33,40 +33,34 @@ List<Map<String, dynamic>> userData = [
   ]
 },
 {
-  "uid": "",
-  "name": "Zayn Jarvis",
-  "email": "zaynjarvis@gmail.com",
+  "uid": "111543282107749631272",
+  "name": "Zayn Kevin",
+  "email": "zaynK@gmail.com",
   "interests": [
-    "technology",
     "sport",
     "programming",
   ],
   "events": [
-    "101",
-    "102",
-    "103"
+    "101"
   ],
   "organizations": [
-    "Garage@EEE",
+    "Chinese Society",
     "Open Source Society",
   ]
 },
 {
-  "uid": "",
-  "name": "Zayn Jarvis",
-  "email": "zaynjarvis@gmail.com",
+  "uid": "111543282107749631201",
+  "name": "Zayn Angel",
+  "email": "zaynA@gmail.com",
   "interests": [
-    "technology",
     "sport",
     "programming",
   ],
   "events": [
-    "101",
     "102",
     "103"
   ],
   "organizations": [
-    "Garage@EEE",
     "Open Source Society",
   ]
 }
