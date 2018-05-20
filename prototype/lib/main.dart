@@ -22,7 +22,8 @@ class Tribes extends StatelessWidget {
         ),
         routes: <String, WidgetBuilder>{
           "/main": (BuildContext context) => MainPage(store:store),
-        }
+        },
+        debugShowCheckedModeBanner: false,
       ),
     );
   }

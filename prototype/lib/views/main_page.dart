@@ -2,7 +2,7 @@ import 'dart:async';
 // import 'dart:convert' show json;
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:redux/redux.dart';
+// import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../util/redux_controller.dart';
@@ -27,11 +27,10 @@ class MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
-      print('changed');
       setState(() {
         _currentUser = account;
-        widget.store.dispatch(AddUser(user:_currentUser));
       });
+      widget.store.dispatch(AddUser(user:_currentUser));
     });
     _googleSignIn.signInSilently();
   }
@@ -51,7 +50,6 @@ class MainPageState extends State<MainPage> {
     if (_currentUser != null) {
       return Scaffold(
         drawer: Drawer(
-          
           child: ListView(
             children: <Widget>[
               StoreConnector<AppState, ObjectCallBack>(
@@ -60,9 +58,13 @@ class MainPageState extends State<MainPage> {
                 },
                 builder: (context, ocb) {
                   var _user = ocb();
+                  print(_user.id);
                   return UserAccountsDrawerHeader(
+                    margin: EdgeInsets.all(10.0),
                     accountName: Text(_user.displayName),
-                    accountEmail: Text(_user.email),
+                    accountEmail: Text(_user.email, style: TextStyle(
+                      color: Colors.grey.withOpacity(0.6)
+                    ),),
                     currentAccountPicture: GoogleUserCircleAvatar(identity: _user),
                 );
                 }
@@ -72,7 +74,6 @@ class MainPageState extends State<MainPage> {
                 trailing: Icon(Icons.arrow_right),
                 onTap: (){
                   Navigator.of(context).pop();
-                  Navigator.of(context).pushNamed("/1");
                 }
               ),
               new ListTile(
@@ -80,7 +81,6 @@ class MainPageState extends State<MainPage> {
                 trailing: Icon(Icons.arrow_right),
                 onTap: (){
                   Navigator.of(context).pop();
-                  Navigator.of(context).pushNamed("/2");
                 }
               ),
               new Divider(height: 1.0),
