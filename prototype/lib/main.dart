@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
-import 'util/redux_controller.dart';
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+
 
 // views
 import './views/main_page.dart';
 
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+// data
+import './data/dependency_injection.dart';
+import './data/schema.dart';
+
+
+// util
+import 'util/redux_controller.dart';
 
 class Tribes extends StatelessWidget {
   // Initialize Redux Store
@@ -29,4 +36,11 @@ class Tribes extends StatelessWidget {
 }
 
 
-void main() => runApp(Tribes());
+void main() {
+  Injector.configure(UserProfile.MOCK);
+  // Repo rp = Injector().repo;
+  // rp.fetchData();
+    // .then((data)=>print);
+
+  return runApp(Tribes());
+} 
