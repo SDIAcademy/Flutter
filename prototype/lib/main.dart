@@ -3,6 +3,7 @@ import 'util/redux_controller.dart';
 
 // views
 import './views/main_page.dart';
+import './views/user_profile.dart';
 
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -23,6 +24,7 @@ class Tribes extends StatelessWidget {
         ),
         routes: <String, WidgetBuilder>{
           "/main": (BuildContext context) => MainPage(store:store),
+          "/profile": (BuildContext context) => UserProfile(),
         },
         debugShowCheckedModeBanner: false,
       ),

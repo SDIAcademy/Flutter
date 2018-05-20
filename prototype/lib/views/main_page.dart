@@ -6,11 +6,12 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../util/redux_controller.dart';
+import '../util/google_sign_in_button.dart';
 
 GoogleSignIn _googleSignIn = new GoogleSignIn(
   scopes: <String>[
     'email',
-    'https://www.googleapis.com/auth/contacts.readonly',
+    // 'https://www.googleapis.com/auth/contacts.readonly',
   ],
 );
 
@@ -21,7 +22,10 @@ class MainPage extends StatefulWidget {
   State createState() => new MainPageState();
 }
 
-class MainPageState extends State<MainPage> {
+class MainPageState extends State<MainPage>{
+  Animation<double> animation;
+  AnimationController controller;
+
   GoogleSignInAccount _currentUser;
   String _currentDrawer;
   List _drawerStore = [
@@ -45,11 +49,16 @@ class MainPageState extends State<MainPage> {
     _currentDrawer = "Home";
 
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
-      setState(() {
-        _currentUser = account;
+      try{
+        setState(() {
+          _currentUser = account;
+        });
+        widget.store.dispatch(AddUser(user:_currentUser));
+        } catch(e){
+          print('error in initState');
+          print(e);
+        }
       });
-      widget.store.dispatch(AddUser(user:_currentUser));
-    });
     _googleSignIn.signInSilently();
   }
 
@@ -60,8 +69,13 @@ class MainPageState extends State<MainPage> {
     );
   }
   Future<Null> _handleSignOut(viewModel) async {
+    try{
     viewModel.addUser({});
     _googleSignIn.disconnect();
+    } catch(e){
+      print('error when log out');
+      print(e);
+    }
   }
 
   
@@ -83,7 +97,7 @@ class MainPageState extends State<MainPage> {
                     _currentDrawer = item['title'];                   
                   });
                   Navigator.of(context).pop();
-                  // Navigator.of(context).push(item['callback]());
+                  // Navigator.of(context).push(item['callback‘]());
                 }
               ),
             ),
@@ -104,7 +118,7 @@ class MainPageState extends State<MainPage> {
                     padding: const EdgeInsets.all(15.0),
                     child: UserAccountsDrawerHeader(
                       onDetailsPressed: (){
-                        print(_user.email);
+                        Navigator.of(context).pushNamed('/profile');
                       },
                       accountName: Text(
                         _user.displayName,
@@ -182,28 +196,39 @@ class MainPageState extends State<MainPage> {
         ),
       );
     } else {
-      return new Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Image(image: AssetImage("assets/sdi.png"),width: 200.0),
-          StoreConnector<AppState, ViewModel>(
-            converter: (store) => ViewModel(
-              addUser:(
-                userInfo
-              ) => store.dispatch(AddUser(
-                user: userInfo
-              ))
-            ),
-            builder: (context,viewModel)=> MaterialButton(
-                height: 40.0,
-                minWidth: 80.0,
-                color: Colors.teal,
-                textColor: Colors.white,
-                child: Text("Login With Google Account"),
-                onPressed: ()=>_handleSignIn(viewModel),
+      return Container(
+        color: Color.fromRGBO(42,42,42,1.0),
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image(
+              image: AssetImage("assets/sdi.png"),
+              width: 200.0,
               ),
-          ),
-        ],
+            Padding(
+              padding: EdgeInsets.all(5.0),
+              ),
+            AnimatedOpacity(
+              opacity: 1.0,
+              duration: Duration(milliseconds: 2000),
+              child: StoreConnector<AppState, ViewModel>(
+                converter: (store) => ViewModel(
+                  addUser:(
+                    userInfo
+                  ) => store.dispatch(AddUser(
+                    user: userInfo
+                  ))
+                ),
+                builder: (context,viewModel) => MaterialButton(
+                    child: buttonRow,
+                    color: Colors.white,
+                    // Text("Login With Google Account"),
+                    onPressed: ()=>_handleSignIn(viewModel),
+                  ),
+              ),
+            ),
+          ],
+        ),
       );
     }
   }
