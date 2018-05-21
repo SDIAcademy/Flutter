@@ -27,26 +27,27 @@ class MainPageState extends State<MainPage>{
   AnimationController controller;
 
   GoogleSignInAccount _currentUser;
-  String _currentDrawer;
+
+  Map _currentDrawer;
   List _drawerStore = [
     {
       'title': "Home",
-      "callback": (){},
+      "callback": (index)=>Colors.teal[index],
     },
     {
-      'title': "Interests",
-      "callback": (){},
+      'title': "Courses",
+      "callback": (index)=>Colors.green[index],
     },
     {
-      'title': "Events",
-      "callback": (){},
+      'title': "Class Room",
+      "callback": (index)=>Colors.grey[index],
     }
   ];
   @override
   void initState() {
     super.initState();
     
-    _currentDrawer = "Home";
+    _currentDrawer = _drawerStore[0];
 
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
       try{
@@ -94,7 +95,7 @@ class MainPageState extends State<MainPage>{
                 title: Text(item['title']),
                 onTap: (){
                   setState(() {
-                    _currentDrawer = item['title'];                   
+                    _currentDrawer = item;             
                   });
                   Navigator.of(context).pop();
                   // Navigator.of(context).push(item['callback‘]());
@@ -187,7 +188,9 @@ class MainPageState extends State<MainPage>{
                   SliverChildBuilderDelegate((BuildContext context, int index) {
                 return Container(
                   alignment: Alignment.center,
-                  color: Colors.teal[100 * (index % 9)],
+                  color: _currentDrawer['callback'](100 * (index % 9)),
+                  // (){
+                  //   _currentDrawer['callback'](100 * (index % 9));}(),
                   child: Text('List Item: $index'),
                 );
               }),
@@ -222,7 +225,6 @@ class MainPageState extends State<MainPage>{
                 builder: (context,viewModel) => MaterialButton(
                     child: buttonRow,
                     color: Colors.white,
-                    // Text("Login With Google Account"),
                     onPressed: ()=>_handleSignIn(viewModel),
                   ),
               ),
