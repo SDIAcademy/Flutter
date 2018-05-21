@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 
 Widget buttonRow = Container(
-  width: 145.0,
+  width: 150.0,
   child: Center(
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.center,

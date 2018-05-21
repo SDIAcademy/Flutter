@@ -24,15 +24,14 @@ class UserProfile extends StatelessWidget {
                 flexibleSpace: FlexibleSpaceBar(
                   title: Text(_user.displayName),
                   background: Image.network(_user.photoUrl),
-                  
                 ),
               ),
               SliverFillViewport(
                 delegate:
                     SliverChildBuilderDelegate((BuildContext context, int index) {
                   return Container(
-                    child: Center(child:Text('Sliver Fill Viewport')),
-                    color: Colors.white,
+                    child: Center(child:Text('My DashBoard')),
+                    color: Colors.orangeAccent,
                   );
                 }, childCount: 2),
               ),

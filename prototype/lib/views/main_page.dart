@@ -91,7 +91,7 @@ class MainPageState extends State<MainPage>{
               selectedColor: Colors.black,
               textColor: Colors.grey,
               child: ListTile(
-                selected: _currentDrawer == item['title'] ,
+                selected: _currentDrawer == item,
                 title: Text(item['title']),
                 onTap: (){
                   setState(() {
