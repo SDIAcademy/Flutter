@@ -21,7 +21,8 @@ class Login extends StatelessWidget {
         "/go": (BuildContext context) => HomePage(),
         "/1": (BuildContext context) => TabComponent(),
         "/2": (BuildContext context) => ChatPage(),
-      }
+      },
+      debugShowCheckedModeBanner: false,
     );
   }
 }
