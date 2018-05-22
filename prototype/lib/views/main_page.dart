@@ -223,7 +223,7 @@ class MainPageState extends State<MainPage>{
                   ))
                 ),
                 builder: (context,viewModel) => MaterialButton(
-                    child: buttonRow,
+                    child: button('Google', 'assets/google.png'),
                     color: Colors.white,
                     onPressed: ()=>_handleSignIn(viewModel),
                   ),
